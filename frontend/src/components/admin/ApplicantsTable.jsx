@@ -1,0 +1,106 @@
+import React from 'react'
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '../ui/table'
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import { MoreHorizontal } from 'lucide-react';
+import { useSelector } from 'react-redux';
+import { toast } from 'sonner';
+import { APPLICATION_API_END_POINT } from '@/utils/constant';
+import axios from 'axios';
+
+const shortlistingStatus = ["Accepted", "Rejected"];
+
+const ApplicantsTable = () => {
+    const { applicants } = useSelector(store => store.application);
+
+    const statusHandler = async (status, id) => {
+        console.log('called');
+        try {
+            axios.defaults.withCredentials = true;
+            const res = await axios.post(`${APPLICATION_API_END_POINT}/status/${id}/update`, { status });
+            console.log(res);
+            if (res.data.success) {
+                toast.success(res.data.message);
+            }
+        } catch (error) {
+            toast.error(error.response.data.message);
+        }
+    }
+
+    // SIMPLIFIED: Cloudinary URLs work directly, no transformation needed
+    const getResumeUrl = (resumeData) => {
+        if (!resumeData) return null;
+        return resumeData; // Cloudinary URL works directly
+    }
+
+    return (
+        <div>
+            <Table>
+                <TableCaption>A list of your recent applied user</TableCaption>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>FullName</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Contact</TableHead>
+                        <TableHead>Resume</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead className="text-right">Action</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {
+                        applicants && applicants?.applications?.map((item) => {
+                            const resumeUrl = getResumeUrl(item.applicant?.profile?.resume);
+                            
+                            return (
+                                <tr key={item._id}>
+                                    <TableCell>{item?.applicant?.fullname}</TableCell>
+                                    <TableCell>{item?.applicant?.email}</TableCell>
+                                    <TableCell>{item?.applicant?.phoneNumber}</TableCell>
+                                    <TableCell>
+                                        {
+                                            resumeUrl ? 
+                                                <a 
+                                                    className="text-blue-600 cursor-pointer hover:underline" 
+                                                    href={resumeUrl} 
+                                                    target="_blank" 
+                                                    rel="noopener noreferrer"
+                                                >
+                                                    {item?.applicant?.profile?.resumeOriginalName}
+                                                    {/* Add PDF indicator if it's a PDF file */}
+                                                    {item?.applicant?.profile?.resumeOriginalName?.toLowerCase().endsWith('.pdf') &&
+                                                        <span className="ml-1 text-xs text-red-600 font-medium">(PDF)</span>
+                                                    }
+                                                </a> : 
+                                                <span>NA</span>
+                                        }
+                                    </TableCell>
+                                    <TableCell>{item?.applicant?.createdAt?.split("T")[0]}</TableCell>
+                                    <TableCell className="float-right cursor-pointer">
+                                        <Popover>
+                                            <PopoverTrigger>
+                                                <MoreHorizontal />
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-32">
+                                                {
+                                                    shortlistingStatus.map((status, index) => {
+                                                        return (
+                                                            <div onClick={() => statusHandler(status, item?._id)} key={index} className='flex w-fit items-center my-2 cursor-pointer'>
+                                                                <span>{status}</span>
+                                                            </div>
+                                                        )
+                                                    })
+                                                }
+                                            </PopoverContent>
+                                        </Popover>
+                                    </TableCell>
+                                </tr>
+                            )
+                        })
+                    }
+                </TableBody>
+            </Table>
+        </div>
+    )
+}
+
+export default ApplicantsTable
