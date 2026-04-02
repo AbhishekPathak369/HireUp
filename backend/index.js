@@ -17,7 +17,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use(cookieParser());
 const corsOptions = {
-    origin: ["https://hireup-plum.vercel.app"],
+    origin: "https://hireup-plum.vercel.app",
     credentials: true
 }
 
