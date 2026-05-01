@@ -14,7 +14,7 @@ const Chatbot = () => {
   const recognitionRef = useRef(null);
 
   // Groq API Key
-  const GROQ_API_KEY = "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";
+  const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY;
   const MODEL = "llama-3.1-8b-instant";
 
   const scrollToBottom = () => {
