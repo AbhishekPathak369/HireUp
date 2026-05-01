@@ -16,6 +16,7 @@ const Chatbot = () => {
   // Groq API Key
   const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY;
   const MODEL = "llama-3.1-8b-instant";
+  console.log("API KEY:", GROQ_API_KEY); // 👈 ADD HERE
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });

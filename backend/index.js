@@ -17,7 +17,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use(cookieParser());
 const corsOptions = {
-    origin: "https://hireup-abhi.onrender.com",
+    origin: ["http://localhost:5173", "https://hireup-abhi.onrender.com"],
     credentials: true
 }
 
